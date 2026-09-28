@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="program_lab1/program_lab1.csproj" />
+  <Project Path="program_lab2/program_lab2.csproj" Id="6f2fa351-66fa-4225-8eb0-567fd79d7f39" />
+  <Project Path="UnitTest/UnitTest.csproj" Id="a8597dcb-8028-4304-8fa1-d2b8c64847ec" />
+</Solution>
