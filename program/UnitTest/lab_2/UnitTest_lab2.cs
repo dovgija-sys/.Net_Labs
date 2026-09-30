@@ -1,9 +1,9 @@
 ﻿using program_lab2.Classes;
 
-namespace UnitTest
+namespace UnitTests.lab_2
 {
     [TestClass]
-    public class UnitTest
+    public class UnitTest_lab2
     {
         // Test method for Task1 class
         [TestMethod]
