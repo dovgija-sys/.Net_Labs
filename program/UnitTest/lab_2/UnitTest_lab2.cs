@@ -16,6 +16,15 @@ namespace UnitTests.lab_2
         }
 
         [TestMethod]
+        public void Task1_Negative_ReturnsSq()
+        {
+            var calc = new Calculation_Task1(2, 4, -1);
+            var expected = 125;
+            var actual = calc.Calculate();
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
         public void Task1_NotAllEven_SquareOfSum()
         {
             var calc = new Calculation_Task1(1, 2, 3);

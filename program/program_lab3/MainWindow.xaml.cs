@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using program_lab3.Classes;
 
@@ -8,7 +6,7 @@ namespace program_lab3
 {
     public partial class MainWindow : Window
     {
-        private List<Furniture> _furnitureList = new List<Furniture>();
+        private List<Furniture> _furnitureList = [];
 
         public MainWindow()
         {

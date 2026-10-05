@@ -25,21 +25,6 @@
                 }
             }
         }
-        public int Count()
-        {
-            int count = 0;
-            for (int i = 0; i < _Xlength; i++)
-            {
-                for (int j = i+1; j < _Ylength; j++)
-                {
-                    if (B[i, j] > 0)
-                    {
-                        count++;
-                    }
-                }
-            }
-            return count;
-        }
         public int Xlength
         {
             get { return _Xlength; }
@@ -97,7 +82,21 @@
                     error = true;
                 }
             }
-
+        }
+        public int Count()
+        {
+            int sum = 0;
+            for (int i = 0; i < _Xlength; i++)
+            {
+                for (int j =i; j < _Ylength; j++)
+                {
+                    if (i == j)
+                    {
+                        sum+=B[i, j];
+                    }
+                }
+            }
+            return sum;
         }
     }
 }

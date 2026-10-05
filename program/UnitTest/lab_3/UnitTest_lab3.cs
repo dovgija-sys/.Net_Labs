@@ -11,6 +11,25 @@ namespace UnitTests.lab_3
             Assert.Throws<Exception>(() => new Chair("Office Chair", "Leather", -150.0, true));
             Assert.Throws<Exception>(() => new Table("Dining Table", "Wood", -300.0, "Rectangle"));
         }
+
+        [TestMethod]
+        public void TestChairsPrice()
+        {
+            var chairsList = new List<Chair>
+            {
+                new Chair("Office Chair", "Leather", 150.0, true),
+                new Chair("Office", "Leather", 100.0, false),
+                new Chair("Oe Chair", "Leather", 200.0, true),
+                new Chair("Office Chr", "Leather", 300.0, false)
+            };
+            var analysis = new FurnitureAnalysis();
+
+            var SA = analysis.GetAveragePriceChairs(chairsList);
+
+            double expectedTotalLeather = 750/4;
+            Assert.AreEqual(expectedTotalLeather, SA);
+        }
+
         [TestMethod]
         public void TestGetTotalPriceByMaterial()
         {

@@ -30,18 +30,6 @@
                 this[i] = new WindRecord(direction,rand.Next(0, 31));
             }
         }
-        public int Count()
-        {
-            int count = 0;
-            for (int i = 0; i < length; i++)
-            {
-                if (this[i].Power > 8 && this[i].Direction == "Південний")
-                {
-                    count++;
-                }
-            }
-            return count;
-        }
         public int Length { get { return length; } set { length = value; } }
         public WindRecord this[int index]
         {
@@ -71,5 +59,17 @@
                 }
             }
         }
+        public int Count()
+        {
+            int count = 0;
+            for (int i = 0; i < length; i++)
+            {
+                if (this[i].Power > 8 && this[i].Direction == "Південний")
+                {
+                    count++;
+                }
+            }
+            return count;
+        }   
     }
 }

@@ -29,6 +29,10 @@ namespace program_lab2.Classes
         {
             if (_a % 2 == 0 && _b % 2 == 0 && _c % 2 == 0)
                 return _a * _b * _c;
+            else if(_a < 0 || _b < 0 || _c < 0)
+            {
+                return Math.Pow(_a + _b + _c, 3);
+            }
             else
                 return Math.Pow(_a + _b + _c, 2);
         }
