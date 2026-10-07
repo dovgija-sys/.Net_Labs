@@ -1,17 +1,27 @@
-﻿using System.Windows;
+﻿using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Controls;
 using program_lab3.Classes;
+using program_lab3.Interfaces;
 
 namespace program_lab3
 {
     public partial class MainWindow : Window
     {
-        private List<Furniture> _furnitureList = [];
+        // Колекція зберігає посилання на інтерфейс (поліморфізм).
+        // ObservableCollection одразу відображається у FurnitureObjectsListBox.
+        private readonly ObservableCollection<IFurniture> _furnitureList = [];
+        private readonly IFurnitureAnalysis _analysis = new FurnitureAnalysis();
+
+        private const int TableIndex = 0;
+        private const int ChairIndex = 1;
+        private const int WardrobeIndex = 2;
 
         public MainWindow()
         {
             InitializeComponent();
-            FurnitureTypeComboBox.SelectedIndex = 0;
+            FurnitureObjectsListBox.ItemsSource = _furnitureList;
+            FurnitureTypeComboBox.SelectedIndex = TableIndex;
             SetInitialUiState();
         }
 
@@ -24,44 +34,47 @@ namespace program_lab3
         {
             if (TableFields == null) return;
 
-            if (FurnitureTypeComboBox.SelectedIndex == 0)
-            {
-                TableFields.Visibility = Visibility.Visible;
-                TableInputs.Visibility = Visibility.Visible;
-                ChairFields.Visibility = Visibility.Collapsed;
-                ChairInputs.Visibility = Visibility.Collapsed;
+            int index = FurnitureTypeComboBox.SelectedIndex;
 
-                GetDimensionsButton.Visibility = Visibility.Visible;
-                GetInstructionButton.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                TableFields.Visibility = Visibility.Collapsed;
-                TableInputs.Visibility = Visibility.Collapsed;
-                ChairFields.Visibility = Visibility.Visible;
-                ChairInputs.Visibility = Visibility.Visible;
+            TableFields.Visibility = index == TableIndex ? Visibility.Visible : Visibility.Collapsed;
+            TableInputs.Visibility = TableFields.Visibility;
 
-                GetDimensionsButton.Visibility = Visibility.Collapsed;
-                GetInstructionButton.Visibility = Visibility.Visible;
-            }
+            ChairFields.Visibility = index == ChairIndex ? Visibility.Visible : Visibility.Collapsed;
+            ChairInputs.Visibility = ChairFields.Visibility;
+
+            WardrobeFields.Visibility = index == WardrobeIndex ? Visibility.Visible : Visibility.Collapsed;
+            WardrobeInputs.Visibility = WardrobeFields.Visibility;
         }
 
-        private Furniture CreateFurnitureFromInputs()
+        // Створює об'єкт із полів вводу. Викликається ТІЛЬКИ з кнопки Add.
+        private IFurniture CreateFurnitureFromInputs()
         {
             string type = TypeTextBox.Text;
             string material = MaterialTextBox.Text;
             double price = double.Parse(PriceTextBox.Text);
 
-            if (FurnitureTypeComboBox.SelectedIndex == 0)
+            switch (FurnitureTypeComboBox.SelectedIndex)
             {
-                string shape = ShapeTextBox.Text;
-                return new Table(type, material, price, shape);
+                case TableIndex:
+                    return new Table(type, material, price, ShapeTextBox.Text);
+                case ChairIndex:
+                    bool hasAdjustment = HeightAdjustmentCheckBox.IsChecked ?? false;
+                    return new Chair(type, material, price, hasAdjustment);
+                default:
+                    int doors = int.Parse(DoorsTextBox.Text);
+                    return new Wardrobe(type, material, price, doors);
             }
-            else
+        }
+
+        // Повертає вибраний у списку об'єкт (або показує підказку)
+        private IFurniture? GetSelectedFurniture()
+        {
+            if (FurnitureObjectsListBox.SelectedItem is IFurniture furniture)
             {
-                bool hasAdjustment = HeightAdjustmentCheckBox.IsChecked ?? false;
-                return new Chair(type, material, price, hasAdjustment);
+                return furniture;
             }
+            MessageBox.Show("Select a furniture item in the list first.", "Info");
+            return null;
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
@@ -70,6 +83,7 @@ namespace program_lab3
             {
                 var furniture = CreateFurnitureFromInputs();
                 _furnitureList.Add(furniture);
+                FurnitureObjectsListBox.SelectedItem = furniture;
                 FurnitureListBox.Items.Add($"[Added] {furniture.Type} | Material: {furniture.Material} | Price: ${furniture.Price}");
                 UpdateAnalytics();
             }
@@ -81,61 +95,63 @@ namespace program_lab3
 
         private void AssembleButton_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                var furniture = CreateFurnitureFromInputs();
-                _furnitureList.Add(furniture);
-                FurnitureListBox.Items.Add($"[Assembly] {furniture.Assembly()} | Price: ${furniture.Price}");
-                UpdateAnalytics();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error");
-            }
+            var furniture = GetSelectedFurniture();
+            if (furniture == null) return;
+            FurnitureListBox.Items.Add($"[Assembly] {furniture.Assembly()} | Price: ${furniture.Price}");
         }
 
         private void CleanButton_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                var furniture = CreateFurnitureFromInputs();
-                _furnitureList.Add(furniture);
-                FurnitureListBox.Items.Add($"[Cleaning] {furniture.Clean()}");
-                UpdateAnalytics();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error");
-            }
+            var furniture = GetSelectedFurniture();
+            if (furniture == null) return;
+            FurnitureListBox.Items.Add($"[Cleaning] {furniture.Clean()}");
         }
 
         private void GetDimensionsButton_Click(object sender, RoutedEventArgs e)
         {
-            try
+            var furniture = GetSelectedFurniture();
+            if (furniture == null) return;
+
+            if (furniture is Table table)
             {
-                var table = (Table)CreateFurnitureFromInputs();
-                _furnitureList.Add(table);
                 FurnitureListBox.Items.Add($"[Dimensions] {table.GetDimensions()}");
-                UpdateAnalytics();
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show(ex.Message, "Error");
+                MessageBox.Show("Dimensions are available only for a table.", "Info");
             }
         }
 
         private void GetInstructionButton_Click(object sender, RoutedEventArgs e)
         {
-            try
+            var furniture = GetSelectedFurniture();
+            if (furniture == null) return;
+
+            if (furniture is IInstructable instructable)
             {
-                var chair = (Chair)CreateFurnitureFromInputs();
-                _furnitureList.Add(chair);
-                FurnitureListBox.Items.Add($"[Instruction] {chair.GetAssemblyInstructions()}");
-                UpdateAnalytics();
+                FurnitureListBox.Items.Add($"[Instruction] {instructable.GetAssemblyInstructions()}");
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show(ex.Message, "Error");
+                MessageBox.Show("This item has no assembly instructions (chair or wardrobe only).", "Info");
+            }
+        }
+
+        // Демонстрація поліморфізму: одна колекція IFurniture, різна поведінка
+        private void AssembleAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (IFurniture furniture in _furnitureList)
+            {
+                FurnitureListBox.Items.Add($"[Assemble All] {furniture.Type}: {furniture.Assembly()}");
+            }
+        }
+
+        // Демонстрація поліморфізму: вибірка за інтерфейсом IInstructable
+        private void AllInstructionsButton_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (IInstructable instructable in _furnitureList.OfType<IInstructable>())
+            {
+                FurnitureListBox.Items.Add($"[All Instructions] {instructable.GetAssemblyInstructions()}");
             }
         }
 
@@ -152,8 +168,7 @@ namespace program_lab3
                 TotalMaterialPriceTextBlock.Text = "$0.00";
                 return;
             }
-            var analysis = new FurnitureAnalysis();
-            double total = analysis.GetTotalPriceByMaterial(_furnitureList, targetMaterial);
+            double total = _analysis.GetTotalPriceByMaterial(_furnitureList, targetMaterial);
             TotalMaterialPriceTextBlock.Text = $"${total:F2}";
         }
     }

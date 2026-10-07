@@ -1,6 +1,8 @@
-﻿namespace program_lab3.Classes
+﻿using program_lab3.Interfaces;
+
+namespace program_lab3.Classes
 {
-    public class Chair : Furniture
+    public class Chair : Furniture, IInstructable
     {
         public Chair() : base()
         {
@@ -34,4 +36,3 @@
         }
     }
 }
-

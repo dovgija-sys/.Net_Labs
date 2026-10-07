@@ -1,6 +1,8 @@
-﻿namespace program_lab3.Classes
+﻿using program_lab3.Interfaces;
+
+namespace program_lab3.Classes
 {
-    public abstract class Furniture
+    public abstract class Furniture : IFurniture
     {
         private double _price;
         public Furniture()
@@ -20,12 +22,13 @@
         public double Price
         {
             get { return _price; }
-            set {
+            set
+            {
                 if (value < 0) { throw new("Price can't be less than 0"); }
-                _price = value; 
+                _price = value;
             }
         }
-        public virtual string Assembly() { return null!;}
-        public virtual string Clean() { return null!;}
+        public abstract string Assembly();
+        public abstract string Clean();
     }
 }

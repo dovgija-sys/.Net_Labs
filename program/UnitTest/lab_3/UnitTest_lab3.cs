@@ -26,7 +26,7 @@ namespace UnitTests.lab_3
 
             var SA = analysis.GetAveragePriceChairs(chairsList);
 
-            double expectedTotalLeather = 750/4;
+            double expectedTotalLeather = 750.0/4.0;
             Assert.AreEqual(expectedTotalLeather, SA);
         }
 
